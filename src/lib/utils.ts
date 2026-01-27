@@ -6,52 +6,38 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export async function fetchUser() {  
-  let data = { user: null };
+export async function fetchUser() {
   try {
-    const res = await fetch("http://localhost:3115/check-auth", {
+    const authUrl = import.meta.env.VITE_AUTH_URL;
+    if (!authUrl) {
+      console.error("VITE_AUTH_URL is not defined in .env");
+      return null;
+    }
+
+    const res = await fetch(authUrl + "/check-auth", {
       method: "GET",
       credentials: "include", // important if auth uses cookies/session
     });
     const data = await res.json();
-    if (data.logged_in && data.user.email) {
-      console.log("Fetched user email:", data['user']['email']);
+    if (data.logged_in && data.user) {
+      // console.log("Fetched user:", data.user);
       return data.user;
     }
   } catch (error) {
-    console.error("Error fetching user email:", error);
+    console.error("Error fetching user:", error);
   }
   return null;
-};
+}
 
 export async function isAdmin(): Promise<boolean> {
   const adminEmails = import.meta.env.VITE_ADMIN_EMAIL
-    ? import.meta.env.VITE_ADMIN_EMAIL.split(",").map((email) => email.trim())
+    ? import.meta.env.VITE_ADMIN_EMAIL.split(",").map((email: string) => email.trim())
     : [];
+
   const user = await fetchUser();
-  if (!user) {
+  if (!user || !user.email) {
     return false;
   }
-  const userEmail = user.email;
-  console.log("User:", userEmail);
-  console.log("Admin Emails:", adminEmails);
-  return userEmail ? adminEmails.includes(userEmail) : false;
-}
 
-export async function fetchUserEmail() {
-  try {
-        const res = await fetch("http://localhost:3115/check-auth", {
-          method: "GET",
-          credentials: "include", // important if auth uses cookies/session
-        });
-        const data = await res.json();
-        console.log("Auth check response:", data);
-        if (data.logged_in && data.user.email) {
-          console.log("Fetched user email:", data['user']['email']);
-          return (data.user.email);
-        }
-      } catch (error) {
-        console.error("Error fetching user email:", error);
-        return null;
-      }
-    };
+  return adminEmails.includes(user.email);
+}

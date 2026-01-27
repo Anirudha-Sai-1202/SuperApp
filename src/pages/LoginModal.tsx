@@ -33,7 +33,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
     setIsLoading(true);
     try {
-      const backendResponse = await fetch(import.meta.env.VITE_BACKEND_AUTH_URL, {
+      const backendResponse = await fetch(import.meta.env.VITE_AUTH_URL + "/auth/google", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

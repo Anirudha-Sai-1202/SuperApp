@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 // removed unused Card/CardContent/Badge imports after switching to compact tiles
-import { fetchUserEmail, isAdmin as checkIsAdmin } from "@/lib/utils";
+import { fetchUser, isAdmin as checkIsAdmin } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -91,9 +91,9 @@ const Index = () => {
 
   // Fetch user email from cookie/localStorage (adjust as needed)
   useEffect(() => {
-    fetchUserEmail().then(email => {
-      setUserEmail(email);
-      if (email) {
+    fetchUser().then(user => {
+      setUserEmail(user?.email || null);
+      if (user?.email) {
         checkIsAdmin().then(setIsAdmin);
       } else {
         setIsAdmin(false);
@@ -361,7 +361,7 @@ const Index = () => {
                               handleEditClick(app);
                             }}
                           >
-                            <Pencil className="h-4 w-4 text-black hover:text-white" strokeWidth={2.5}/>
+                            <Pencil className="h-4 w-4 text-black hover:text-white" strokeWidth={2.5} />
                           </Button>
                         </div>
                       )}
