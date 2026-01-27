@@ -83,7 +83,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
       script.defer = true;
       script.onload = () => {
         if (window.google) {
-          console.log("Google script loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
           window.google.accounts.id.initialize({
             client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
@@ -96,8 +95,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
       };
       document.body.appendChild(script);
     } else {
-                console.log("Google script loaded", import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
       window.google.accounts.id.initialize({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleCredentialResponse,

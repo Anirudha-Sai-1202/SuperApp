@@ -31,7 +31,7 @@ const AppView = () => {
   const { data: apps, isLoading, error } = useQuery<App[]>({
     queryKey: ["apps"],
     queryFn: async () => {
-      const res = await fetch("/api/apps");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apps`);
       return res.json();
     },
   });
@@ -80,7 +80,7 @@ const AppView = () => {
   if (isLoading || adminLoading) {
     return <div>Loading...</div>;
   }
-  
+
   if (error || !app) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-blue-100 to-indigo-100">

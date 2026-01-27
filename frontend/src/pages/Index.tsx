@@ -106,14 +106,14 @@ const Index = () => {
   const { data: apps, refetch } = useQuery<App[]>({
     queryKey: ['apps'],
     queryFn: async () => {
-      const res = await fetch('/api/apps');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apps`);
       return res.json();
     }
   });
 
   const toggleMutation = useMutation({
     mutationFn: async ({ appId, isenabled }: { appId: string; isenabled: boolean }) => {
-      const res = await fetch(`/api/apps/${appId}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/apps/${appId}/status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -139,13 +139,13 @@ const Index = () => {
   // Admin: Add or Edit app
   const handleSaveApp = async (app: Partial<App>) => {
     if (editingApp) {
-      await fetch('/api/apps', {
+      await fetch(`${import.meta.env.VITE_API_URL}/apps`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(app)
       });
     } else {
-      await fetch('/api/apps', {
+      await fetch(`${import.meta.env.VITE_API_URL}/apps`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(app)
