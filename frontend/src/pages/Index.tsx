@@ -6,8 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import "./index.css";
 import {
   Bus,
   FileWarning,
@@ -26,6 +35,8 @@ import {
   Key,
   Home,
   Pencil,
+  Menu,
+  User,
 } from "lucide-react";
 import { useEffect } from "react";
 import { Icon } from "@radix-ui/react-select";
@@ -84,6 +95,7 @@ const Index = () => {
   } = useAuth();
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [animatingAppId, setAnimatingAppId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -93,6 +105,7 @@ const Index = () => {
   useEffect(() => {
     fetchUser().then(user => {
       setUserEmail(user?.email || null);
+      setUserName(user?.family_name || user?.name || null);
       if (user?.email) {
         checkIsAdmin().then(setIsAdmin);
       } else {
@@ -203,58 +216,126 @@ const Index = () => {
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
         <div className="px-3 sm:px-6 py-4 sm:py-8">
-          <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <div className="flex items-center gap-3">
-              {/* Superman-style logo with shield design */}
-              <div className="relative group">
-                <div className="w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all duration-300 border-4 border-blue-800/20">
-                  {/* Shield shape background */}
-                  <div className="absolute inset-2 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-xl shadow-inner flex items-center justify-center">
-                    {/* Inner glow effect */}
-                    <div className="absolute inset-1 bg-gradient-to-br from-red-400/30 to-transparent rounded-lg"></div>
-                    {/* CS text with Superman styling */}
-                    <span className="text-white font-black text-2xl tracking-wider relative z-10 text-shadow-lg drop-shadow-xl">CL</span>
+          <div className="max-w-7xl mx-auto">
+
+            {/* TOP ROW */}
+            <div className="flex items-center">
+
+              {/* LEFT : Logo + Title */}
+              <div className="flex items-center gap-3 flex-1">
+                {/* Superman-style logo */}
+                <div className="relative group">
+                  <div className="w-14 h-14 sm:w-15 sm:h-15 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all duration-300 border-4 border-blue-800/20">
+                    <div className="absolute inset-1 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-xl shadow-inner flex items-center justify-center">
+                      <div className="absolute inset-1 bg-gradient-to-br from-red-400/30 to-transparent rounded-lg"></div>
+                      <span className="text-white font-black text-2xl tracking-wider relative z-10 drop-shadow-xl">
+                        CL
+                      </span>
+                    </div>
+                    <div className="absolute top-1 left-1/2 -translate-x-1/2 w-8 h-2 bg-white/20 rounded-full blur-sm"></div>
                   </div>
-                  {/* Top highlight */}
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-8 h-2 bg-white/20 rounded-full blur-sm"></div>
+
+                  <div className="absolute -top-2 -right-2 hidden sm:flex w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-300 group-hover:animate-pulse">
+                    <div className="w-3 h-3 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full"></div>
+                  </div>
+
+                  <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:bg-blue-400/30 transition-all duration-300 -z-10"></div>
                 </div>
-                {/* Floating elements around logo */}
-                <div className="absolute -top-2 -right-2 hidden sm:flex w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-300 group-hover:animate-pulse">
-                  <div className="w-3 h-3 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full"></div>
+
+                <div className="truncate">
+                  <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-700 bg-clip-text text-transparent truncate">
+                    Campus Life
+                  </h1>
+                  <p className="text-gray-600 mt-1 font-medium hidden sm:block text-sm">
+                    Student Centric Campus Automation Suite
+                  </p>
                 </div>
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:bg-blue-400/30 transition-all duration-300 -z-10"></div>
               </div>
-              <div className="truncate">
-                <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-700 bg-clip-text text-transparent truncate">
-                  Campus Life
-                </h1>
-                <p className="text-gray-600 mt-1 font-medium hidden sm:block">Student Centric Campus Automation Suite</p>
+
+              {/* CENTER : Username (desktop only) */}
+              <div className="hidden sm:flex flex-1 justify-center">
+                <div className="text-center animate-fade-in font-['Poppins']">
+                  <div className="text-md text-slate-500 font-medium tracking-wide">
+                    Hey there 👋
+                  </div>
+                  {userName && (
+                    <div className="text-2xl font-semibold text-indigo-600 tracking-wider">
+                      {userName}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+
+
+              {/* RIGHT : Login / Logout */}
+              <div className="flex-1 flex justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-white/50 transition-colors">
+                      <Menu className="h-6 w-6 text-gray-700" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 rounded-xl bg-white/95 backdrop-blur-xl shadow-xl border-gray-200/60 p-2">
+                    <DropdownMenuLabel className="text-xs font-bold text-gray-500 uppercase tracking-wider px-2 py-1.5">My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-gray-100 my-1" />
+
+                    {isAuthenticated && (
+                      <>
+                        <DropdownMenuItem
+                          className="rounded-lg focus:bg-indigo-50 focus:text-indigo-700 cursor-pointer px-3 py-2.5"
+                          onClick={() => navigate("/profile")}
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          <span className="font-medium">Profile</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-gray-100 my-1" />
+                      </>
+                    )}
+
+                    <DropdownMenuItem
+                      onClick={isAuthenticated ? logout : login}
+                      className={`rounded-lg cursor-pointer px-3 py-2.5 ${isAuthenticated
+                        ? 'text-red-600 focus:bg-red-50 focus:text-red-700'
+                        : 'text-indigo-600 focus:bg-indigo-50 focus:text-indigo-700'
+                        }`}
+                    >
+                      {isAuthenticated ? (
+                        <>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span className="font-medium">Logout</span>
+                        </>
+                      ) : (
+                        <>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          <span className="font-medium">Login</span>
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
-            {isAuthenticated ? (
-              <Button
-                onClick={logout}
-                className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-6 py-2.5 font-medium"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
-            ) : (
-              <Button
-                onClick={login}
-                className="bg-white/90 text-gray-700 hover:bg-white hover:text-gray-800 border border-gray-300/80 flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-6 py-2.5 font-medium"
-              >
-                <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline">Login</span>
-              </Button>
-            )}
-          </div>
 
-          <div className="text-center mt-8 max-w-3xl mx-auto">
-            <p className="text-lg text-gray-700 leading-relaxed font-medium">
-              Your unified ecosystem for student centric campus experience. Simplfied Life.
-            </p>
+            {/* MOBILE USERNAME (below logo) */}
+            <div className="sm:hidden mt-4 text-center animate-fade-in font-sans">
+              <div className="text-sm text-slate-500 font-medium tracking-wide">
+                Hey there 👋
+              </div>
+              {userName && (
+                <div className="text-lg font-bold text-indigo-600 tracking-wider">
+                  {userName}
+                </div>
+              )}
+            </div>
+
+            {/* BOTTOM TAGLINE */}
+            <div className="text-center mt-8 max-w-3xl mx-auto">
+              <p className="text-lg text-gray-700 leading-relaxed font-medium">
+                Your unified ecosystem for student centric campus experience. Simplified Life.
+              </p>
+            </div>
+
           </div>
         </div>
       </div>

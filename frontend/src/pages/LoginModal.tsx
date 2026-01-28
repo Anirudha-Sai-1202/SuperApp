@@ -53,13 +53,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onLogin }) => {
 
       // Set cookies for JWT and user data
       const isSecure = window.location.protocol === 'https:';
-      const isLocalhost = window.location.hostname === 'localhost';
+      const is = window.location.hostname === '';
       const cookieOptions = {
         path: '/',
-        secure: isSecure && !isLocalhost,
+        secure: isSecure && !is,
         sameSite: 'lax' as const,
         expires: 1,
-        ...(isLocalhost ? {} : { domain: '.vjstartup.com' }),                   
+        ...(is ? {} : { domain: '.vjstartup.com' }),
       };
 
       Cookies.set('userToken', token, cookieOptions);
