@@ -38,7 +38,9 @@ export async function addApp(app) {
 }
 
 export async function isAdmin(email) {
-    return email === process.env.VITE_ADMIN_EMAIL;
+    const adminEmails = process.env.VITE_ADMIN_EMAIL.split(',').map(e => e.trim());
+    console.log('Admin Emails:', adminEmails);
+    return adminEmails.includes(email);
 }
 
 export async function updateApp(app) {

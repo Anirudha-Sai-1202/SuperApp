@@ -9,7 +9,7 @@ const app = express();
 const PORT = 6102;
 
 app.use(cors({
-    origin: ['http://localhost:3102', 'http://[IP_ADDRESS]', 'https://anirudh.vjstartup.com'],
+    origin: ['http://localhost:8081', 'http://localhost:3102', 'http://[IP_ADDRESS]', 'https://anirudh.vjstartup.com', 'http://10.100.16.121:3102'],
     credentials: true
 }));
 app.use(express.json());

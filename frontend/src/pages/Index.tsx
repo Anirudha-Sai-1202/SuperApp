@@ -14,6 +14,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import "./index.css";
@@ -37,8 +47,9 @@ import {
   Pencil,
   Menu,
   User,
+  Settings,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Icon } from "@radix-ui/react-select";
 import { AddAppModal } from "@/components/AddAppModal";
 
@@ -192,6 +203,36 @@ const Index = () => {
     }, 500);
   };
 
+  const [selectedAppForManagement, setSelectedAppForManagement] = useState<App | null>(null);
+  const longPressTimerRef = useRef<number | null>(null);
+  const isLongPressRef = useRef(false);
+
+  const handleTouchStart = (app: App) => {
+    if (!isAdmin) return;
+    isLongPressRef.current = false;
+    longPressTimerRef.current = window.setTimeout(() => {
+      isLongPressRef.current = true;
+      setSelectedAppForManagement(app);
+      // Vibrate if supported
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, 500); // 500ms long press
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleAppClick = (app: App, e: React.MouseEvent | React.TouchEvent) => {
+    if (isLongPressRef.current) {
+      e.preventDefault();
+      return;
+    }
+    openApp(app);
+  };
+
   const sendMessage = () => {
     if (!chatMessage.trim()) return;
 
@@ -319,7 +360,7 @@ const Index = () => {
 
             {/* MOBILE USERNAME (below logo) */}
             <div className="sm:hidden mt-4 text-center animate-fade-in font-sans">
-              <div className="text-sm text-slate-500 font-medium tracking-wide">
+              <div className="text-sm text-slate-500 font-medium tracking-wide ">
                 Hey there 👋
               </div>
               {userName && (
@@ -330,7 +371,7 @@ const Index = () => {
             </div>
 
             {/* BOTTOM TAGLINE */}
-            <div className="text-center mt-8 max-w-3xl mx-auto">
+            <div className="text-center mt-8 max-w-3xl mx-auto hidden sm:block">
               <p className="text-lg text-gray-700 leading-relaxed font-medium">
                 Your unified ecosystem for student centric campus experience. Simplified Life.
               </p>
@@ -357,13 +398,25 @@ const Index = () => {
                   style={{ animationDelay: `${index * 40}ms` }}
                 >
                   <button
-                    onClick={() => openApp(app)}
+                    onClick={(e) => handleAppClick(app, e)}
+                    onTouchStart={() => handleTouchStart(app)}
+                    onTouchEnd={handleTouchEnd}
+                    onContextMenu={(e) => {
+                      if (isAdmin) {
+                        e.preventDefault();
+                        setSelectedAppForManagement(app);
+                      }
+                    }}
                     aria-label={app.name}
                     title={app.name}
                     className={`group flex flex-col items-center gap-1 bg-white/0 rounded-md p-1 w-24 h-24 transition-transform duration-500 ${isSelected ? 'scale-125 z-50' : ''} ${isOtherAnimating ? 'translate-y-6 opacity-30' : ''}`}
                   >
-                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${app.gradient}`}>
+                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${app.gradient} relative`}>
                       <Icon className="h-6 w-6 text-black" />
+                      {/* Admin Indicator Dot */}
+                      {isAdmin && (
+                        <div className={`absolute top-1 right-1 w-2.5 h-2.5 rounded-full border border-white ${app.isenabled ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      )}
                     </div>
                     <span className="text-[12px] text-gray-800 mt-1 text-center truncate w-full">{app.name}</span>
                   </button>
@@ -487,6 +540,15 @@ const Index = () => {
           </Button>
         </div>
       )}
+      
+      {isAdmin && (
+        <div className="fixed bottom-6 left-0 w-full z-50 flex justify-center sm:hidden">
+          <p className="text-xs text-gray-500">
+            Admin! Long Press apps to edit or disable.
+          </p>
+        </div>
+      )}
+
 
       {/* Enhanced Chatbot */}
       <div className="fixed bottom-6 right-6 z-50">
@@ -571,6 +633,55 @@ const Index = () => {
         onAdd={handleSaveApp}
         initialData={editingApp}
       />
+
+      {/* Mobile Admin Management Drawer */}
+      <Drawer open={!!selectedAppForManagement} onOpenChange={(open) => !open && setSelectedAppForManagement(null)}>
+        <DrawerContent>
+          <div className="mx-auto w-full max-w-sm">
+            <DrawerHeader>
+              <DrawerTitle className="text-xl font-bold flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Manage App
+              </DrawerTitle>
+              <DrawerDescription>Settings for {selectedAppForManagement?.name}</DrawerDescription>
+            </DrawerHeader>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium text-gray-900">App Status</div>
+                  <div className="text-xs text-gray-500">
+                    {selectedAppForManagement?.isenabled ? "Currently Enabled" : "Currently Disabled"}
+                  </div>
+                </div>
+                {selectedAppForManagement && (
+                  <Switch
+                    checked={selectedAppForManagement.isenabled}
+                    onCheckedChange={(checked) => handleToggle(selectedAppForManagement.id, checked)}
+                  />
+                )}
+              </div>
+
+              <Button
+                onClick={() => {
+                  if (selectedAppForManagement) {
+                    handleEditClick(selectedAppForManagement);
+                    setSelectedAppForManagement(null);
+                  }
+                }}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit Details
+              </Button>
+            </div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline">Close</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };

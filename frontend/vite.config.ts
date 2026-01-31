@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => ({
         secure: false,
       },
     },
+    allowedHosts: ["anirudh.vjstartup.com", "10.100.16.121", "[IP_ADDRESS]", "superapp.local"],
   },
 
   plugins: [

@@ -76,7 +76,7 @@ const AppView = () => {
 
 
   console.log("AppView rendering for appId:", appId, "Found app:", app);
-  console.log("isAdmin:", isAdminUser);
+  // console.log("isAdmin:", isAdminUser);
   if (isLoading || adminLoading) {
     return <div>Loading...</div>;
   }
