@@ -453,7 +453,7 @@ const Index = () => {
                             <Icon className="h-8 w-8 text-black" />
                             <div className="absolute top-2 left-2 w-4 h-2 bg-white/20 rounded-full blur-sm"></div>
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-white/90 rounded-full flex items-center justify-center shadow-md">
-                              <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
+                              <div className={`w-2 h-2 rounded-full opacity-60 ${app.isenabled ? 'bg-green-500' : 'bg-red-500'}`}></div>
                             </div>
                             <div className={`absolute inset-0 bg-gradient-to-br ${app.gradient} rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10`}></div>
                           </div>
@@ -656,7 +656,14 @@ const Index = () => {
                 {selectedAppForManagement && (
                   <Switch
                     checked={selectedAppForManagement.isenabled}
-                    onCheckedChange={(checked) => handleToggle(selectedAppForManagement.id, checked)}
+                    onCheckedChange={(checked) => {
+                      // Optimistically update the local state for immediate UI feedback
+                      setSelectedAppForManagement({
+                        ...selectedAppForManagement,
+                        isenabled: checked
+                      });
+                      handleToggle(selectedAppForManagement.id, checked);
+                    }}
                   />
                 )}
               </div>
