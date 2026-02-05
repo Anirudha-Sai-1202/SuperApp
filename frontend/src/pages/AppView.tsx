@@ -201,7 +201,7 @@ const AppView = () => {
                 setIframeError(null);
                 if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
               }}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation allow-modals"
             />
 
             {/* Loading overlay: show app name & description for better context */}
